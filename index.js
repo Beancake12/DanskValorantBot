@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 
 var spawnerId = '725994476279169095';
-var spawnedCahnnels = [,];
+var spawnedCahnnels = [];
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -22,16 +22,20 @@ client.on('voiceStateUpdate', (oldState, newState) => {
         if(newState.channel && newState.channel.id === spawnerId) {
             // Get user obj
             let user = newState.member;
-            let spawnedChannelGuild
+            let spawnedChannelGuild;
             
             // Check if there is any object in array
-            if(Object.keys(spawnedCahnnels).length) {
-                // Get guild obj from spawnedCahnnels
-                spawnedChannelGuild = spawnedCahnnels.find(x => x.guildId === newState.guild.id);
-            }
+            spawnedCahnnels.forEach((item) => {
+                if(typeof item !== undefined) {
+                    if(item.guildId === newState.guild.id) {
+                        spawnedChannelGuild = item;
+                        return;
+                    }
+                }
+            })
 
             // Create guild object if nothing found
-            if(spawnedChannelGuild === undefined) {
+            if(!spawnedChannelGuild) {
                 spawnedChannelGuild = {
                     guildId: newState.guild.id,
                     channels: []
@@ -40,7 +44,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
                 spawnedCahnnels.push(spawnedChannelGuild);
             }
             
-            channelSuffix = spawnedCahnnels.findIndex(x => x === undefined) !== -1 ? spawnedCahnnels.findIndex(x => x === undefined) : spawnedCahnnels.length;
+            channelSuffix = spawnedCahnnels.findIndex(x => x === undefined) !== -1 ? spawnedCahnnels.findIndex(x => x === undefined)+1 : spawnedCahnnels.length;
 
             // Create new channel
             newState.guild.channels.create('Spilgruppe ' + channelSuffix, {type: 'voice'})
@@ -58,16 +62,28 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 
     // Delete empty spawned channels
     try {
-        let spawnedCahnnelObject = spawnedCahnnels.find(obj => obj.guildId === oldState.guild.id); // Guilds channel object e.g. { guildId: 1, channels: [1, 2] }
-        let channelIndex = spawnedCahnnelObject.channels.indexOf(oldState.channelID); // Channel index in guild object
+        let spawnedCahnnelObject;
+        spawnedCahnnels.forEach((item) => {
+            if(typeof item !== undefined) {
+                if(item.guildId === oldState.guild.id) {
+                    spawnedCahnnelObject = item;
+                    return;
+                }
+            }
+        })
+        if(spawnedCahnnelObject) {
 
-        // If channel exist and is empty, delete it
-        if((channelIndex !== -1) && ( oldState.channel.members.size === 0)) {
-            oldState.channel.delete()
-            .then(() => {
-                delete spawnedCahnnels[spawnedCahnnels.indexOf(spawnedCahnnelObject)];
-            })
-            .catch(console.error)
+            // let spawnedCahnnelObject = spawnedCahnnels.find(obj => obj.guildId === oldState.guild.id); // Guilds channel object e.g. { guildId: 1, channels: [1, 2] }
+            let channelIndex = spawnedCahnnelObject.channels.indexOf(oldState.channelID); // Channel index in guild object
+    
+            // If channel exist and is empty, delete it
+            if((channelIndex !== -1) && ( oldState.channel.members.size === 0)) {
+                oldState.channel.delete()
+                .then(() => {
+                    delete spawnedCahnnels[spawnedCahnnels.indexOf(spawnedCahnnelObject)];
+                })
+                .catch(console.error)
+            }
         }
     } catch (error) {
         console.log(error)
