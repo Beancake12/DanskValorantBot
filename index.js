@@ -71,16 +71,15 @@ client.on('voiceStateUpdate', (oldState, newState) => {
                 }
             }
         })
-        if(spawnedCahnnelObject) {
 
-            // let spawnedCahnnelObject = spawnedCahnnels.find(obj => obj.guildId === oldState.guild.id); // Guilds channel object e.g. { guildId: 1, channels: [1, 2] }
+        if(spawnedCahnnelObject) {
             let channelIndex = spawnedCahnnelObject.channels.indexOf(oldState.channelID); // Channel index in guild object
-    
+            
             // If channel exist and is empty, delete it
             if((channelIndex !== -1) && ( oldState.channel.members.size === 0)) {
                 oldState.channel.delete()
                 .then(() => {
-                    delete spawnedCahnnels[spawnedCahnnels.indexOf(spawnedCahnnelObject)];
+                    delete spawnedCahnnels[channelIndex];
                 })
                 .catch(console.error)
             }
