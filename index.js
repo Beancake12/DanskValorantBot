@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
@@ -25,7 +27,7 @@ client.on('message', message => {
 client.on('voiceStateUpdate', (oldState, newState) => {
     // Create channel
     try {
-        if(newState.channel && newState.channel.id === createVoiceChannelId) {
+        if(newState.channel && newState.channel.id === creatorId) {
             // Get user obj
             let user = newState.member;
             this.guild;
@@ -96,4 +98,4 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 
 
 
-client.login('NzI1NzE0ODgzMjk0OTIwNzQ1.XvS-Zg.SFdgHQxGKtXOQS8L2eW8newPjJ8');
+client.login(process.env.BOT_TOKEN);
