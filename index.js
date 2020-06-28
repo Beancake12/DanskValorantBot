@@ -3,24 +3,25 @@ require('dotenv').config()
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-var creatorId = '725994476279169095';
+var creatorId = '';
+var creatorName = '';
 var guilds = [];
 
-const emptyGuildObject = {
-    guildId: '',
-    creatoirId: '',
-    channels: [],
-}
-
 client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
+    console.log(`${client.user.tag} ready!`);
 });
 
 client.on('message', message => {
-    // Set channelid for spawner e.g. !bean creatorid 725750483666337922
-    let setCreatorIdRegex = /^!bean creatorid [0-9]+/;
-    if(setCreatorIdRegex.test(message)) {
-        creatorId = message.content.match(/[0-9]+/g)[0]
+    // Set creatorid e.g. !creatorid 725750483666337922
+    if(/^!creatorid\s[0-9]+/.test(message)) {
+        creatorId = message.content.match(/[0-9]+/g)[0] // Match first number
+        message.reply('Creator ID set to: ' + creatorId);
+    }
+
+    // Set creatorname e.g. !creatorname Spilgruppe
+    if(/^!creatorname\s([a-zA-Z ]+)/.test(message)) {
+        creatorName = message.content.match(/^!creatorname\s(.*)/)[1]; // Match everything after first space
+        message.reply('Creator name set to: "' + creatorName + '"');
     }
 });
 
@@ -55,7 +56,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
             channelSuffix = this.guild.channels.findIndex(x => x === undefined) !== -1 ? this.guild.channels.findIndex(x => x === undefined) : this.guild.channels.length;
 
             // Create new channel
-            newState.guild.channels.create('Spilgruppe ' + channelSuffix, {type: 'voice'})
+            newState.guild.channels.create(creatorName + ' ' + channelSuffix, {type: 'voice'})
             .then(newChannel => {
                 this.guild.channels.push(newChannel.id); // Add new channel to guild object
                 
@@ -95,7 +96,5 @@ client.on('voiceStateUpdate', (oldState, newState) => {
         console.log(error)
     }
 });
-
-
 
 client.login(process.env.BOT_TOKEN);
