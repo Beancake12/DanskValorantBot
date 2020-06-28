@@ -1,0 +1,13 @@
+{
+    "name": "VoiceChannelCreator",
+    "description": "A bot to automaticly create and delete voice channels on discord",
+    "version": "0.0.1",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "dependencies": {
+        "discord.js": "12.2.0",
+        "dotenv": "^8.2.0"
+    }
+}
