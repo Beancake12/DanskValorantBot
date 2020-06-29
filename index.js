@@ -82,12 +82,13 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 
         if(this.guild) {
             // let this.guild = guilds.find(obj => obj.guildId === oldState.guild.id); // Guilds channel object e.g. { guildId: 1, channels: [1, 2] }
-            let channelIndex = this.guild.channels.indexOf(oldState.channelID); // Channel index in guild objectspa
+            let channelIndex = this.guild.channels.indexOf(oldState.channelID); // Channel index in guild objects
+
             // If channel exist and is empty, delete it
-            if((channelIndex !== -1) && ( oldState.channel.members.size === 0)) {
+            if((channelIndex !== -1) && (oldState.channel.members.size === 0)) {
                 oldState.channel.delete()
                 .then(() => {
-                    delete this.guild[channelIndex];
+                    delete this.guild.channels[channelIndex];
                 })
                 .catch(console.error)
             }
