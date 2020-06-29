@@ -21,10 +21,9 @@ client.on('voiceStateUpdate', (oldState, newState) => {
             let channelName = creatorName + ' ' + channelSuffix;
 
             // Create new channel
-            newState.guild.channels.create(channelName, {type: 'voice'})
+            newState.guild.channels.create(channelName, {type: 'voice', parent: process.env.CREATOR_CATEGORY_ID})
             .then(newChannel => {
                 channels.push(newChannel.id); // Add new channel to guild object
-                newChannel.setParent(process.env.CREATOR_CATEGORY_ID) // Move channel to category
                 user.voice.setChannel(newChannel); // Move user to new channel
             })
             .catch(console.error);
