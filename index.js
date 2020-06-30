@@ -77,34 +77,34 @@ client.on('messageReactionAdd', async  (reaction, user) => {
         if(rankRoles.indexOf(reaction.emoji.name) !== -1) {
             // Find  the react role in the guild
             let guildRole = reaction.message.guild.roles.cache.find(role => role.name === reaction.emoji.name)
-            let roleManager = reaction.message.member.roles;
         
             if(guildRole) {            
-                // Add new role
-                roleManager.add(guildRole)
-                .then(() => {
-                    // Get old reactions
-                    reaction.message.reactions.cache.forEach(cachedReaction => {
-                        // Get all users who reacted
-                        cachedReaction.users.fetch()
-                        .then(users => {
-                            // If user user reacted
-                            if(users.has(user.id)) {
-                                // Clear all reactions that's not the new reaction
-                                if(cachedReaction.emoji.name !== reaction.emoji.name) {
-                                    cachedReaction.users.remove(user.id)
-                                    .catch(console.error);
+                // Get reacting user and add role
+                reaction.message.guild.members.fetch(user)
+                .then(guildMemeber => {
+                    guildMemeber.roles.add(guildRole)
+                    .then(() => {
+                        // Loop through old reaction on message
+                        reaction.message.reactions.cache.forEach(cachedReaction => {
+                            // Get all users who reacted and clear other reactions
+                            cachedReaction.users.fetch()
+                            .then(users => {
+                                if(users.has(user.id)) {
+                                    if(cachedReaction.emoji.name !== reaction.emoji.name) {
+                                        cachedReaction.users.remove(user.id)
+                                        .catch(console.error);
+                                    }
                                 }
-                            }
-                        })
-                        .catch(console.error);
-                    });
+                            })
+                            .catch(console.error);
+                        });
+                    })
+                    .catch(console.error);
                 })
-                .catch(console.error);
+                .catch(console.error)
             }
         }
-         else {
-            // If not in rank roles remove reaction
+         else { // If not in rank roles remove reaction
             reaction.remove();
         }
     }
