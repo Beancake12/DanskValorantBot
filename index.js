@@ -79,19 +79,31 @@ client.on('messageReactionAdd', async  (reaction, user) => {
             let guildRole = reaction.message.guild.roles.cache.find(role => role.name === reaction.emoji.name)
             let roleManager = reaction.message.member.roles;
         
-            if(guildRole) {
-                // Remove rank role from user
-                roleManager.cache.forEach(role => {
-                    if(rankRoles.indexOf(role.name) !== -1) {
-                        roleManager.remove(role);
-                    }
-                });
-            
+            if(guildRole) {            
                 // Add new role
                 roleManager.add(guildRole)
+                .then(() => {
+                    // Get old reactions
+                    reaction.message.reactions.cache.forEach(cachedReaction => {
+                        // Get all users who reacted
+                        cachedReaction.users.fetch()
+                        .then(users => {
+                            // If user user reacted
+                            if(users.has(user.id)) {
+                                // Clear all reactions that's not the new reaction
+                                if(cachedReaction.emoji.name !== reaction.emoji.name) {
+                                    cachedReaction.users.remove(user.id)
+                                    .catch(console.error);
+                                }
+                            }
+                        })
+                        .catch(console.error);
+                    });
+                })
                 .catch(console.error);
             }
-        } else {
+        }
+         else {
             // If not in rank roles remove reaction
             reaction.remove();
         }
