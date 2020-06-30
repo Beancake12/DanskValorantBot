@@ -73,21 +73,27 @@ client.on('messageReactionAdd', async  (reaction, user) => {
 
     // Check if reacted to the correct message
     if(reaction.message.id === reactRankId) {
-        // Find  the react role in the guild
-        let guildRole = reaction.message.guild.roles.cache.find(role => role.name === reaction.emoji.name)
-        let roleManager = reaction.message.member.roles;
-    
-        if(guildRole) {
-            // Clear old rank roles
-            roleManager.cache.forEach(role => {
-                if(rankRoles.indexOf(role.name) !== -1) {
-                    roleManager.remove(role);
-                }
-            });
+        // Only allow rank roles as reaction to this message
+        if(rankRoles.indexOf(reaction.emoji.name) !== -1) {
+            // Find  the react role in the guild
+            let guildRole = reaction.message.guild.roles.cache.find(role => role.name === reaction.emoji.name)
+            let roleManager = reaction.message.member.roles;
         
-            // Add new role
-            roleManager.add(guildRole)
-            .catch(console.error);
+            if(guildRole) {
+                // Remove rank role from user
+                roleManager.cache.forEach(role => {
+                    if(rankRoles.indexOf(role.name) !== -1) {
+                        roleManager.remove(role);
+                    }
+                });                
+            
+                // Add new role
+                roleManager.add(guildRole)
+                .catch(console.error);
+            }
+        } else {
+            // If not in rank roles remove reaction
+            reaction.remove();
         }
     }
 });
