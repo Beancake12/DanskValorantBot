@@ -85,7 +85,7 @@ client.on('messageReactionAdd', async  (reaction, user) => {
                     if(rankRoles.indexOf(role.name) !== -1) {
                         roleManager.remove(role);
                     }
-                });                
+                });
             
                 // Add new role
                 roleManager.add(guildRole)
@@ -95,6 +95,20 @@ client.on('messageReactionAdd', async  (reaction, user) => {
             // If not in rank roles remove reaction
             reaction.remove();
         }
+    }
+});
+
+client.on('messageReactionRemove', (reaction, user) => {
+    // Get rank role from guild
+    let guildRole = reaction.message.channel.guild.roles.cache.find(role => role.name === reaction.emoji.name);
+
+    if(guildRole) {
+        // Get guild user and remove rank role from that user
+        reaction.message.channel.guild.members.fetch(user.id)
+        .then(guildMemeber => {
+            guildMemeber.roles.remove(guildRole);
+        })
+        .catch(console.error);
     }
 });
 
