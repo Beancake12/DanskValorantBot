@@ -28,13 +28,13 @@ client.on('voiceStateUpdate', (oldState, newState) => {
         if(newState.channel && newState.channel.id === creatorId) {
             // Get user obj
             let user = newState.member;
-            let channelSuffix = (channels.findIndex(x => x === undefined) !== -1 ?channels.findIndex(x => x === undefined) : channels.length) + 1; // Look for empty slots as suffix, to avoid suffix id duplicate
-            let channelName = creatorName + ' ' + channelSuffix;
+            let channelSuffix = channels.findIndex(x => x === undefined) !== -1 ? channels.findIndex(x => x === undefined) : channels.length; // Look for empty slots as suffix, to avoid suffix id duplicate
+            let channelName = creatorName + ' ' + (channelSuffix + 1);
 
             // Create new channel
             newState.guild.channels.create(channelName, {type: 'voice', parent: process.env.CREATOR_CATEGORY_ID})
             .then(newChannel => {
-                channels.push(newChannel.id); // Add new channel to guild object
+                channels[channelSuffix] = newChannel.id;
                 user.voice.setChannel(newChannel); // Move user to new channel
             })
             .catch(console.error);
