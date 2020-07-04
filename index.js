@@ -34,8 +34,13 @@ client.on('voiceStateUpdate', (oldState, newState) => {
             // Create new channel
             newState.guild.channels.create(channelName, {type: 'voice', parent: process.env.CREATOR_CATEGORY_ID})
             .then(newChannel => {
-                channels[channelSuffix] = newChannel.id;
-                user.voice.setChannel(newChannel); // Move user to new channel
+                channels[channelSuffix] = newChannel.id; // Add channel to channels
+
+                // Move users to new channel
+                user.voice.setChannel(newChannel);
+                oldState.channel.members.each((guildMemeber) => {
+                    guildMemeber.voice.setChannel(newChannel);
+                });
             })
             .catch(console.error);
         }
